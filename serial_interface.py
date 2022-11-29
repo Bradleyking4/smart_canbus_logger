@@ -3,6 +3,7 @@ import datetime
 import time
 
 import os
+
 # chose an implementation, depending on os
 if os.name == 'nt': #sys.platform == 'win32':
     from serial.tools.list_ports_windows import *
@@ -54,28 +55,45 @@ class SerialInterface(object):
 			time.sleep(0.2)
 			self.serial.setDTR(False)
 			time.sleep(2)
-			self.serial.write(chr(self.supported_can_bitrates.index(int(can_bitrate))))
+			self.serial.write(chr(self.supported_can_bitrates.index(int(can_bitrate))).encode())
 		except ValueError:
 			raise SerialException("CAN bitrate not supported!")
 
 	def read_message(self):
 		line = self.serial.readline()
-		if len(line)>0 and line[0]=='~' and line[-2]=='.':
+		if len(line)>2 and line[0]==126 and line[-2]==46:
+			# print(line)
+
 			#we have full line, decode it
+			# print("Length",len(line), chr(line[0]), line[0]==126, chr(line[-2]), line[-2]==46)
 			try:
-				data = ''
+				data = bytearray(8)
 				for i in range(1,9):
-					data += hex(ord(line[i]))[2:]
-				data = data.upper()
-				identifier = ''
-				for i in range(9,13):
-					identifier+=hex(ord(line[i]))[2:]
-				identifier = identifier.upper()
+					data[i-1] = (line[i])
+				# for i in range(9,13):
+				identifier  = (line[9]<<24) + (line[10]<<16) + (line[11]<<8) + line[12]
+				print("<- ID:",identifier, " data:", data )
+
 				return CANMessage(identifier, data)
 			except IndexError:
-				print "Index error on line: %s" % line
-
+				print ("Index error on line: %s" , line)
 		return None
+
+	def write_message(self,message):
+		print("-> ID:",message.id, " data:",message.data )
+
+		line = bytearray(15)
+		line[0] = 126
+		for i in range(1,9):
+			line[i] = message.data[i-1]
+		line[9] = (message.id >>24)& 0xff
+		line[10] = (message.id >>26)& 0xff
+		line[11] = (message.id >>8)& 0xff
+		line[12] = message.id & 0xff
+		line[13] = 46
+		line[14] = 10
+		self.serial.write(line)
+
 
 	def disconnect(self):
 		self.serial.close()
