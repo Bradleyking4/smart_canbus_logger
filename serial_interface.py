@@ -17,7 +17,7 @@ class SerialException(serial.SerialException):
 class CANMessage(object):
 
 	def __init__(self,id, data, timestamp=None):
-		self.id = id
+		self.arbitration_id = arbitration_id
 		self.data = data
 		self.timestamp = timestamp or datetime.datetime.now()
 
@@ -80,16 +80,16 @@ class SerialInterface(object):
 		return None
 
 	def write_message(self,message):
-		print("-> ID:",message.id, " data:",message.data )
+		print("-> ID:",message.arbitration_id, " data:",message.data )
 
 		line = bytearray(15)
 		line[0] = 126
 		for i in range(1,9):
 			line[i] = message.data[i-1]
-		line[9] = (message.id >>24)& 0xff
-		line[10] = (message.id >>26)& 0xff
-		line[11] = (message.id >>8)& 0xff
-		line[12] = message.id & 0xff
+		line[9] = (message.arbitration_id >>24)& 0xff
+		line[10] = (message.arbitration_id >>26)& 0xff
+		line[11] = (message.arbitration_id >>8)& 0xff
+		line[12] = message.arbitration_id & 0xff
 		line[13] = 46
 		line[14] = 10
 		self.serial.write(line)

@@ -117,6 +117,8 @@ class MainWindow ( wx.Frame ):
 
 		self.OTA_progress = wx.Gauge( self.wxpanel23, wx.ID_ANY, 100, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
 		self.OTA_progress.SetValue( 0 )
+		self.OTA_progress.SetToolTip( u"dsafs" )
+
 		bSizer161.Add( self.OTA_progress, 0, wx.ALL, 5 )
 
 
@@ -172,7 +174,7 @@ class MainWindow ( wx.Frame ):
 		self.wxpanel23.SetSizer( gSizer5 )
 		self.wxpanel23.Layout()
 		gSizer5.Fit( self.wxpanel23 )
-		self.m_auinotebook4.AddPage( self.wxpanel23, u"Connection", True, wx.NullBitmap )
+		self.m_auinotebook4.AddPage( self.wxpanel23, u"Connection", False, wx.NullBitmap )
 		self.m_panelLogger = wx.Panel( self.m_auinotebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizerLogger = wx.BoxSizer( wx.VERTICAL )
 
@@ -250,8 +252,88 @@ class MainWindow ( wx.Frame ):
 		self.SMU_PANEL.SetSizer( gSizer2 )
 		self.SMU_PANEL.Layout()
 		gSizer2.Fit( self.SMU_PANEL )
-		self.m_auinotebook4.AddPage( self.SMU_PANEL, u"SMU", False, wx.NullBitmap )
+		self.m_auinotebook4.AddPage( self.SMU_PANEL, u"SMU", True, wx.NullBitmap )
 		self.ECU_PANEL = wx.Panel( self.m_auinotebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
+		gSizer21 = wx.GridSizer( 0, 2, 0, 0 )
+
+		bSizer331 = wx.BoxSizer( wx.VERTICAL )
+
+		self.tbxKellyVoltage1 = wx.StaticText( self.ECU_PANEL, wx.ID_ANY, u"Throttle Pos", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.tbxKellyVoltage1.Wrap( -1 )
+
+		bSizer331.Add( self.tbxKellyVoltage1, 0, wx.ALL, 5 )
+
+		self.ECU_ThrottlePos = wx.Gauge( self.ECU_PANEL, wx.ID_ANY, 132, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
+		self.ECU_ThrottlePos.SetValue( 25 )
+		bSizer331.Add( self.ECU_ThrottlePos, 0, wx.ALL, 5 )
+
+		self.tbxKellyVoltage11 = wx.StaticText( self.ECU_PANEL, wx.ID_ANY, u"Kelly Accel", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.tbxKellyVoltage11.Wrap( -1 )
+
+		bSizer331.Add( self.tbxKellyVoltage11, 0, wx.ALL, 5 )
+
+		self.ECU_KellyAccel = wx.Gauge( self.ECU_PANEL, wx.ID_ANY, 132, wx.DefaultPosition, wx.DefaultSize, wx.GA_HORIZONTAL )
+		self.ECU_KellyAccel.SetValue( 25 )
+		bSizer331.Add( self.ECU_KellyAccel, 0, wx.ALL, 5 )
+
+		ECU_PowerStateChoices = [ u"CAR_OFF", u"CAR_ACC", u"CAR_START", u"CAR_RUN", u"CAR_STOP", u"CAR_CHARGING", u"CAR_NUM_STATES" ]
+		self.ECU_PowerState = wx.ComboBox( self.ECU_PANEL, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, ECU_PowerStateChoices, 0 )
+		bSizer331.Add( self.ECU_PowerState, 0, wx.ALL, 5 )
+
+		ECU_SpeedStateChoices = [ u"SPEED__IDLE", u"SPEED_ACCEL", u"SPEED_REVERSE", u"SPEED_REGEN", u"SPEED_CHANGE", u"SPEED_NUM_STATES" ]
+		self.ECU_SpeedState = wx.ComboBox( self.ECU_PANEL, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, ECU_SpeedStateChoices, 0 )
+		bSizer331.Add( self.ECU_SpeedState, 0, wx.ALL, 5 )
+
+		self.KellyPowered = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"Kelly Powered", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer331.Add( self.KellyPowered, 0, wx.ALL, 5 )
+
+		self.MainContactor1 = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"Main Contactor", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer331.Add( self.MainContactor1, 0, wx.ALL, 5 )
+
+		self.ChargeContractor1 = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"Charge Contactor", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer331.Add( self.ChargeContractor1, 0, wx.ALL, 5 )
+
+		self.prechargeComplete1 = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"Precharge Complete", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer331.Add( self.prechargeComplete1, 0, wx.ALL, 5 )
+
+		self.DCDCContactor = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"DCDC Cont", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer331.Add( self.DCDCContactor, 0, wx.ALL, 5 )
+
+		self.StopPedal = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"Stop Pedal", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer331.Add( self.StopPedal, 0, wx.ALL, 5 )
+
+
+		gSizer21.Add( bSizer331, 1, wx.EXPAND, 5 )
+
+		bSizer162 = wx.BoxSizer( wx.VERTICAL )
+
+		self.tbxKellyVoltage = wx.StaticText( self.ECU_PANEL, wx.ID_ANY, u"Kelly Voltage:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.tbxKellyVoltage.Wrap( -1 )
+
+		bSizer162.Add( self.tbxKellyVoltage, 0, wx.ALL, 5 )
+
+		self.tbxKellyCurrent = wx.StaticText( self.ECU_PANEL, wx.ID_ANY, u"Kelly Current:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.tbxKellyCurrent.Wrap( -1 )
+
+		bSizer162.Add( self.tbxKellyCurrent, 0, wx.ALL, 5 )
+
+		self.tbxGearStickPos = wx.StaticText( self.ECU_PANEL, wx.ID_ANY, u"Gear Stick Pos:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.tbxGearStickPos.Wrap( -1 )
+
+		bSizer162.Add( self.tbxGearStickPos, 0, wx.ALL, 5 )
+
+		self.tbxGear = wx.StaticText( self.ECU_PANEL, wx.ID_ANY, u"Gearbox Pos:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.tbxGear.Wrap( -1 )
+
+		bSizer162.Add( self.tbxGear, 0, wx.ALL, 5 )
+
+
+		gSizer21.Add( bSizer162, 1, wx.EXPAND, 5 )
+
+
+		self.ECU_PANEL.SetSizer( gSizer21 )
+		self.ECU_PANEL.Layout()
+		gSizer21.Fit( self.ECU_PANEL )
 		self.m_auinotebook4.AddPage( self.ECU_PANEL, u"ECU", False, wx.NullBitmap )
 		self.m_panel13 = wx.Panel( self.m_auinotebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer34 = wx.BoxSizer( wx.VERTICAL )

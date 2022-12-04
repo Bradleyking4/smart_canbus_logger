@@ -16,9 +16,16 @@ Software
 
 GUI requirements
 =================
-* Python 2.7
+* Python 3.x
 * pyserial
 * wxpython
+
+
+pip3 install attrdict
+pip3 install pyserial
+sudo apt-get install python3-wxgtk4.0
+
+pip3 install wxpython
 
 Hardware connections
 ======================
@@ -42,6 +49,13 @@ Usage
 * Launch GUI by running `python logger.py`. Select serial port, CAN bitrate and connect.
 
 
+sudo ip link set can0 up type can bitrate 500000 
+
+
+sudo ip link set can0 down
+
+
+export DISPLAY=:0
 
 Credits
 ==========

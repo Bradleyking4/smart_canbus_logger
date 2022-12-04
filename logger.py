@@ -8,13 +8,18 @@ import queue
 import datetime
 import time
 
+import can
+
+bustype = 'socketcan'
+channel = 'can0'
+
 
 from ObjectListView import GroupListView, ObjectListView, ColumnDefn, BatchedUpdate
 
 class CANMessage(object):
 
-	def __init__(self,id, data, timestamp=None):
-		self.id = id
+	def __init__(self,arbitration_id, data, timestamp=None):
+		self.arbitration_id = arbitration_id
 		self.data = data
 		self.timestamp = timestamp or datetime.datetime.now()
 
@@ -103,9 +108,9 @@ class Main(wxFormBuilder.MainWindow):
 
     def init_message_list(self):
         self.message_list.SetColumns([
-            # ColumnDefn("ID", "left", 200, "id",groupKeyGetter = "id"),
+            # ColumnDefn("ID", "left", 200, "arbitration_id",groupKeyGetter = "arbitration_id"),
             ColumnDefn("Timestamp", "left", 300, "timestamp"),
-            ColumnDefn("ID", "left", 100, "id",groupKeyGetter = "id",stringConverter="%#X"),
+            ColumnDefn("ID", "left", 100, "arbitration_id",groupKeyGetter = "arbitration_id",stringConverter="%#X"),
             ColumnDefn("Data", "left", 250, "data", minimumWidth=250, stringConverter=dataFormatter),
             ]
 
@@ -116,8 +121,32 @@ class Main(wxFormBuilder.MainWindow):
         Updates serial port selection with available serial ports
         """
         self.serial_combobox.Clear()
+
         self.serial_combobox.AppendItems(self.serial_interface.scan())
+        
+        
+        try:
+            bus = can.interface.Bus(channel=channel, bustype=bustype,bitrate=500000)
+            self.serial_combobox.AppendItems(channel)
+            _hardware_can = True
+            print("HW can Found")
+
+        except:
+            _hardware_can = False
+            print("HW can not Found")
+
+
+
+# msg = can.Message(arbitration_id=0xc0ffee, data=[0, 1, 3, 1, 4, 1], is_extended_id=False)
+# while True:
+# 	bus.send(msg)
+# 	time.sleep(1)
+
         self.serial_combobox.SetSelection(0)
+        if _hardware_can == True:
+            self.on_connect( 0)
+            self.Maximize(True)
+
 
 
     def on_ignore(self, event):
@@ -148,14 +177,14 @@ class Main(wxFormBuilder.MainWindow):
 
         res = []
         for m in object_list:
-            mv = m.id
+            mv = m.arbitration_id
             if mv in self._ignored_messages:
                 continue
 
             if len(val)==0:
                 matches_filter = True
             else:
-                matches_filter = (m.id.startswith(val) or m.data.startswith(val))
+                matches_filter = (m.arbitration_id.startswith(val) or m.data.startswith(val))
             if mv not in self._message_occurences:
                 matches_occurences = True
             else:
@@ -180,7 +209,12 @@ class Main(wxFormBuilder.MainWindow):
                 try:
                     self._TxQueue = multiprocessing.Queue(10)
                     self._RxQueue = multiprocessing.Queue(10)
-                    self._process = process.SerialProcess(serial_port, bitrate, self._TxQueue,self._RxQueue)
+                    
+                    if serial_port == channel:
+                        self._process = process.CanProcess(serial_port, bitrate, self._TxQueue,self._RxQueue)
+                    else:
+                        self._process = process.SerialProcess(serial_port, bitrate, self._TxQueue,self._RxQueue)
+
                     self.connect_button.SetLabel("Disconnect")
                 except (serial_interface.SerialException, e):
                     wx.MessageBox("Cannot open serial port! "+e.message, "Error", wx.OK | wx.ICON_ERROR)
@@ -205,10 +239,10 @@ class Main(wxFormBuilder.MainWindow):
         if hasattr(self, '_RxQueue'):
             try:
                 message = self._RxQueue.get_nowait()
-                print("removed from queue " + str(message.id))
+                print("removed from queue " + str(message.arbitration_id))
 
                 if hasattr(message, 'timestamp'):
-                    message_val = message.id
+                    message_val = message.arbitration_id
 
                     self.process_message(message)
 
@@ -233,7 +267,7 @@ class Main(wxFormBuilder.MainWindow):
             event.RequestMore()
 
     def process_message(self,message):
-        if message.id == 0x420:
+        if message.arbitration_id == 0x420:
             self.SMU_STATE.SetSelection(int(message.data[0]))
             self.estopPressed.SetValue(int(message.data[1]))
             self.SMU_PackVoltage.SetValue(int(message.data[2]))
@@ -242,19 +276,19 @@ class Main(wxFormBuilder.MainWindow):
             self.tbxPreChargeVoltage.SetLabel("PreCharge Voltage: "+ str(message.data[3]))
             self.MainContactor.SetValue(int(message.data[4]&1))
             self.MainContactor.SetValue(int(message.data[4]&2))
-            if self.packetSent > 0:
-                self.send_next_packet()
+            # if self.packetSent > 0:
+            #     self.send_next_packet()
 
-        elif message.id == 0x421:
+        elif message.arbitration_id == 0x421:
             self.send_next_packet()
 
-        elif message.id == 0x423:    
+        elif message.arbitration_id == 0x423:    
             self.tbxAcVoltage.SetLabel()
             self.tbxACcurrent.SetLabel()
-        elif message.id == 0x440:
+        elif message.arbitration_id == 0x440:
             print(" ")
             
-        elif message.id == 0x441:
+        elif message.arbitration_id == 0x441:
             print(" ")
 
     def send_next_packet(self):
