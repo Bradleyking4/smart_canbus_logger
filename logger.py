@@ -266,28 +266,53 @@ class Main(wxFormBuilder.MainWindow):
                 pass
             event.RequestMore()
 
-    def process_message(self,message):
+    def process_message(self, message):
         if message.arbitration_id == 0x420:
             self.SMU_STATE.SetSelection(int(message.data[0]))
             self.estopPressed.SetValue(int(message.data[1]))
-            self.SMU_PackVoltage.SetValue(int(message.data[2]))
-
-            self.tbxPackVoltage.SetLabel("Pack Voltage: "+ str(message.data[2]))
-            self.tbxPreChargeVoltage.SetLabel("PreCharge Voltage: "+ str(message.data[3]))
-            self.MainContactor.SetValue(int(message.data[4]&1))
-            self.MainContactor.SetValue(int(message.data[4]&2))
+            try:
+                self.SMU_PackVoltage.SetValue(int(message.data[2]))
+            except:
+                pass
+            self.tbxPackVoltage.SetLabel(
+                "Pack Voltage: " + str(message.data[2]))
+            self.tbxPreChargeVoltage.SetLabel(
+                "PreCharge Voltage: " + str(message.data[3]))
+            self.MainContactor.SetValue(int(message.data[4] & 1))
+            self.ChargeContractor.SetValue(int((message.data[4] & 2)/2))
             # if self.packetSent > 0:
             #     self.send_next_packet()
 
         elif message.arbitration_id == 0x421:
             self.send_next_packet()
 
-        elif message.arbitration_id == 0x423:    
-            self.tbxAcVoltage.SetLabel()
-            self.tbxACcurrent.SetLabel()
+        elif message.arbitration_id == 0x423:
+            self.AC1present.SetValue(int(message.data[0] & 1))
+            self.AC2present.SetValue(int((message.data[0] & 2)/2))
+            self.tbxAcVoltage.SetLabel(
+                "AC Voltage:" + str(int(message.data[1])*256+int(message.data[2])))
+            self.tbxACcurrent.SetLabel(
+                "AC Current:" + str(int(message.data[3])*256+int(message.data[4])))
         elif message.arbitration_id == 0x440:
+            self.ECU_PowerState.SetSelection(int(message.data[0]))
+            self.ECU_SpeedState.SetSelection(int(message.data[1]))
+
+            self.MainContactor1.SetValue(int(message.data[2] & 1))
+            self.KellyPowered.SetValue(int((message.data[2] & 2)/2))
+            self.ChargeContractor1.SetValue(int((message.data[2] & 4)/4))
+            self.prechargeComplete1.SetValue(int((message.data[2] & 8)/8))
+            self.DCDCContactor.SetValue(int((message.data[2] & 16)/16))
+            self.StopPedal.SetValue(int((message.data[2] & 32)/32))
+
+            self.tbxGear.SetLabel("Gearbox Pos: " + str(message.data[3]))
+            self.tbxGearStickPos.SetLabel(
+                "Gear Stick Pos: " + str(message.data[4]))
+
+            self.ECU_ThrottlePos.SetValue(int(message.data[5]))
+            self.ECU_KellyAccel.SetValue(
+                int(message.data[6])*256+int(message.data[7]))
             print(" ")
-            
+
         elif message.arbitration_id == 0x441:
             print(" ")
 

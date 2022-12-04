@@ -86,7 +86,3 @@ class CanProcess(multiprocessing.Process):
 					bus.send(message)
 			except queue.Empty:
 				pass
-
-
-git config --global user.email "bradleyking4@gmail.com"
-  git config --global user.name "Bradley King"
