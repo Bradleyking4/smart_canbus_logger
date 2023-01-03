@@ -19,9 +19,9 @@ import wx.richtext
 class MainWindow ( wx.Frame ):
 
 	def __init__( self, parent ):
-		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"CANBus logger", pos = wx.DefaultPosition, size = wx.Size( 735,418 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+		wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = u"CANBus logger", pos = wx.DefaultPosition, size = wx.Size( 735,360 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
 
-		self.SetSizeHints( wx.Size( 735,418 ), wx.DefaultSize )
+		self.SetSizeHints( wx.Size( 735,360 ), wx.DefaultSize )
 
 		bSizer26 = wx.BoxSizer( wx.VERTICAL )
 
@@ -252,7 +252,7 @@ class MainWindow ( wx.Frame ):
 		self.SMU_PANEL.SetSizer( gSizer2 )
 		self.SMU_PANEL.Layout()
 		gSizer2.Fit( self.SMU_PANEL )
-		self.m_auinotebook4.AddPage( self.SMU_PANEL, u"SMU", True, wx.NullBitmap )
+		self.m_auinotebook4.AddPage( self.SMU_PANEL, u"SMU", False, wx.NullBitmap )
 		self.ECU_PANEL = wx.Panel( self.m_auinotebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		gSizer21 = wx.GridSizer( 0, 2, 0, 0 )
 
@@ -296,12 +296,6 @@ class MainWindow ( wx.Frame ):
 		self.prechargeComplete1 = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"Precharge Complete", wx.DefaultPosition, wx.DefaultSize, 0 )
 		bSizer331.Add( self.prechargeComplete1, 0, wx.ALL, 5 )
 
-		self.DCDCContactor = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"DCDC Cont", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer331.Add( self.DCDCContactor, 0, wx.ALL, 5 )
-
-		self.StopPedal = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"Stop Pedal", wx.DefaultPosition, wx.DefaultSize, 0 )
-		bSizer331.Add( self.StopPedal, 0, wx.ALL, 5 )
-
 
 		gSizer21.Add( bSizer331, 1, wx.EXPAND, 5 )
 
@@ -317,6 +311,11 @@ class MainWindow ( wx.Frame ):
 
 		bSizer162.Add( self.tbxKellyCurrent, 0, wx.ALL, 5 )
 
+		self.tbxKellyPower = wx.StaticText( self.ECU_PANEL, wx.ID_ANY, u"Motor Power:", wx.DefaultPosition, wx.DefaultSize, 0 )
+		self.tbxKellyPower.Wrap( -1 )
+
+		bSizer162.Add( self.tbxKellyPower, 0, wx.ALL, 5 )
+
 		self.tbxGearStickPos = wx.StaticText( self.ECU_PANEL, wx.ID_ANY, u"Gear Stick Pos:", wx.DefaultPosition, wx.DefaultSize, 0 )
 		self.tbxGearStickPos.Wrap( -1 )
 
@@ -327,6 +326,12 @@ class MainWindow ( wx.Frame ):
 
 		bSizer162.Add( self.tbxGear, 0, wx.ALL, 5 )
 
+		self.StopPedal = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"Stop Pedal", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer162.Add( self.StopPedal, 0, wx.ALL, 5 )
+
+		self.DCDCContactor = wx.CheckBox( self.ECU_PANEL, wx.ID_ANY, u"DCDC Cont", wx.DefaultPosition, wx.DefaultSize, 0 )
+		bSizer162.Add( self.DCDCContactor, 0, wx.ALL, 5 )
+
 
 		gSizer21.Add( bSizer162, 1, wx.EXPAND, 5 )
 
@@ -334,7 +339,7 @@ class MainWindow ( wx.Frame ):
 		self.ECU_PANEL.SetSizer( gSizer21 )
 		self.ECU_PANEL.Layout()
 		gSizer21.Fit( self.ECU_PANEL )
-		self.m_auinotebook4.AddPage( self.ECU_PANEL, u"ECU", False, wx.NullBitmap )
+		self.m_auinotebook4.AddPage( self.ECU_PANEL, u"ECU", True, wx.NullBitmap )
 		self.m_panel13 = wx.Panel( self.m_auinotebook4, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, wx.TAB_TRAVERSAL )
 		bSizer34 = wx.BoxSizer( wx.VERTICAL )
 

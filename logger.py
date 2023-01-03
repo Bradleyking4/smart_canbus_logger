@@ -12,7 +12,7 @@ import can
 
 bustype = 'socketcan'
 channel = 'can0'
-
+motorCurrent = 0
 
 from ObjectListView import GroupListView, ObjectListView, ColumnDefn, BatchedUpdate
 
@@ -38,6 +38,7 @@ class Main(wxFormBuilder.MainWindow):
     _ignore = False
     _ignored_messages = []
     _message_occurences = {}
+
 
     def __init__(self, parent):
         wxFormBuilder.MainWindow.__init__(self,parent)
@@ -268,6 +269,7 @@ class Main(wxFormBuilder.MainWindow):
             event.RequestMore()
 
     def process_message(self, message):
+        global motorCurrent
         if message.arbitration_id == 0x420:
             self.SMU_STATE.SetSelection(int(message.data[0]))
             self.estopPressed.SetValue(int(message.data[1]))
@@ -330,13 +332,14 @@ class Main(wxFormBuilder.MainWindow):
             print(" ")
 
         elif message.arbitration_id == 0x0CF11E05:
+            # global motorCurrent
             speed = message.data[1] * 256 + message.data[0]
-            current = (message.data[3] * 256 + message.data[2]) / 10
+            motorCurrent = motorCurrent * 0.8 + 0.2 *(message.data[3] * 256 + message.data[2]) / 10
             voltage = (message.data[5] * 256 + message.data[4]) / 10
-            Power = current * voltage
+            power = motorCurrent * voltage
             self.tbxKellyVoltage.SetLabel("Pack Voltage:" + str(voltage))
-            self.tbxKellyCurrent.SetLabel("Pack Current:" + str(current))
-            self.tbxKellyPower.SetLabel("Pack Power:" + str(Power))
+            self.tbxKellyCurrent.SetLabel("Pack Current:" + str(motorCurrent))
+            self.tbxKellyPower.SetLabel("Pack Power:" + str(power))
 
             
             print(voltage)
