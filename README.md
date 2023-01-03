@@ -49,7 +49,7 @@ Usage
 * Launch GUI by running `python logger.py`. Select serial port, CAN bitrate and connect.
 
 
-sudo ip link set can0 up type can bitrate 500000 
+sudo ip link set can0 up type can bitrate 250000 
 
 
 sudo ip link set can0 down

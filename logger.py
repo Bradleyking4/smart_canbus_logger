@@ -25,8 +25,9 @@ class CANMessage(object):
 
 
 def dataFormatter(line):
+    
     data = ''
-    for i in range(0,8):
+    for i in range(0,len(line)):
         data += " " + hex(line[i])[2:]
     return data
 
@@ -126,7 +127,7 @@ class Main(wxFormBuilder.MainWindow):
         
         
         try:
-            bus = can.interface.Bus(channel=channel, bustype=bustype,bitrate=500000)
+            bus = can.interface.Bus(channel=channel, bustype=bustype,bitrate=250000)
             self.serial_combobox.AppendItems(channel)
             _hardware_can = True
             print("HW can Found")
@@ -294,10 +295,14 @@ class Main(wxFormBuilder.MainWindow):
             self.tbxACcurrent.SetLabel(
                 "AC Current:" + str(int(message.data[3])*256+int(message.data[4])))
         elif message.arbitration_id == 0x440:
+            if len(message.data) < 8:
+                return
             self.ECU_PowerState.SetSelection(int(message.data[0]))
             self.ECU_SpeedState.SetSelection(int(message.data[1]))
 
-            self.MainContactor1.SetValue(int(message.data[2] & 1))
+            print(int(message.data[2]))
+
+            self.MainContactor1.SetValue((int(message.data[2]) & 1))
             self.KellyPowered.SetValue(int((message.data[2] & 2)/2))
             self.ChargeContractor1.SetValue(int((message.data[2] & 4)/4))
             self.prechargeComplete1.SetValue(int((message.data[2] & 8)/8))
@@ -308,13 +313,33 @@ class Main(wxFormBuilder.MainWindow):
             self.tbxGearStickPos.SetLabel(
                 "Gear Stick Pos: " + str(message.data[4]))
 
-            self.ECU_ThrottlePos.SetValue(int(message.data[5]))
-            self.ECU_KellyAccel.SetValue(
-                int(message.data[6])*256+int(message.data[7]))
-            print(" ")
+            if int(message.data[5]) <= 100:
+                self.ECU_ThrottlePos.SetValue(int(message.data[5]))
+            else:
+                print(" 5 ")
+                print(int(message.data[5]))
+                print(" ")
+            
+            if (int(message.data[6])*256+int(message.data[7]))/100 <= 100:
+                 self.ECU_KellyAccel.SetValue(
+                (int(message.data[6])*256+int(message.data[7]))/100)
+            else:
+                print(" ")
 
         elif message.arbitration_id == 0x441:
             print(" ")
+
+        elif message.arbitration_id == 0x0CF11E05:
+            speed = message.data[1] * 256 + message.data[0]
+            current = (message.data[3] * 256 + message.data[2]) / 10
+            voltage = (message.data[5] * 256 + message.data[4]) / 10
+            Power = current * voltage
+            self.tbxKellyVoltage.SetLabel("Pack Voltage:" + str(voltage))
+            self.tbxKellyCurrent.SetLabel("Pack Current:" + str(current))
+            self.tbxKellyPower.SetLabel("Pack Power:" + str(Power))
+
+            
+            print(voltage)
 
     def send_next_packet(self):
         print("send packet:" + str(self.packetSent) )
