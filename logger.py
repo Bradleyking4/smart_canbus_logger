@@ -281,8 +281,8 @@ class Main(wxFormBuilder.MainWindow):
                 "Pack Voltage: " + str(message.data[2]))
             self.tbxPreChargeVoltage.SetLabel(
                 "PreCharge Voltage: " + str(message.data[3]))
-            self.MainContactor.SetValue(int(message.data[4] & 1))
-            self.ChargeContractor.SetValue(int((message.data[4] & 2)/2))
+            self.MainContactor.SetValue((int(message.data[4]) & 1))
+            self.ChargeContractor.SetValue((int((message.data[4]) & 2)/2))
             # if self.packetSent > 0:
             #     self.send_next_packet()
 
@@ -290,7 +290,7 @@ class Main(wxFormBuilder.MainWindow):
             self.send_next_packet()
 
         elif message.arbitration_id == 0x423:
-            self.AC1present.SetValue(int(message.data[0] & 1))
+            self.AC1present.SetValue(int((message.data[0]) & 1))
             self.AC2present.SetValue(int((message.data[0] & 2)/2))
             self.tbxAcVoltage.SetLabel(
                 "AC Voltage:" + str(int(message.data[1])*256+int(message.data[2])))
@@ -304,16 +304,16 @@ class Main(wxFormBuilder.MainWindow):
 
             print(int(message.data[2]))
 
-            self.MainContactor1.SetValue((int(message.data[2]) & 1))
-            self.KellyPowered.SetValue(int((message.data[2] & 2)/2))
-            self.ChargeContractor1.SetValue(int((message.data[2] & 4)/4))
-            self.prechargeComplete1.SetValue(int((message.data[2] & 8)/8))
-            self.DCDCContactor.SetValue(int((message.data[2] & 16)/16))
-            self.StopPedal.SetValue(int((message.data[2] & 32)/32))
+            self.MainContactor1.SetValue((int(message.data[2]) & 1)) #0
+            self.KellyPowered.SetValue(int((message.data[2] & 2)/2)) #1
+            self.ChargeContractor1.SetValue(int((message.data[2] & 4)/4)) #2
+            self.prechargeComplete1.SetValue(int((message.data[2] & 8)/8)) #3
+            self.DCDCContactor.SetValue(int((message.data[2] & 16)/16)) #4
+            self.StopPedal.SetValue(int((message.data[2] & 32)/32)) #5
 
             self.tbxGear.SetLabel("Gearbox Pos: " + str(message.data[3]))
             self.tbxGearStickPos.SetLabel(
-                "Gear Stick Pos: " + str(message.data[4]))
+                "Gear Stick Pos: " + chr (message.data[4]))
 
             if int(message.data[5]) <= 100:
                 self.ECU_ThrottlePos.SetValue(int(message.data[5]))
@@ -338,8 +338,8 @@ class Main(wxFormBuilder.MainWindow):
             voltage = (message.data[5] * 256 + message.data[4]) / 10
             power = motorCurrent * voltage
             self.tbxKellyVoltage.SetLabel("Pack Voltage:" + str(voltage))
-            self.tbxKellyCurrent.SetLabel("Pack Current:" + str(motorCurrent))
-            self.tbxKellyPower.SetLabel("Pack Power:" + str(power))
+            self.tbxKellyCurrent.SetLabel("Pack Current:" + str(round(motorCurrent,2)))
+            self.tbxKellyPower.SetLabel("Pack Power:" + str(round(power,2)))
 
             
             print(voltage)
